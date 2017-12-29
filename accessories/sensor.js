@@ -52,6 +52,10 @@ class HomeAssistantSensor {
     return parseFloat(data.state);
   }
 
+  transformData2(data) {
+    return parseFloat(data.state);
+  }  
+  
   onEvent(oldState, newState) {
     if (this.service === Service.CarbonDioxideSensor) {
       const transformed = this.transformData(newState);
