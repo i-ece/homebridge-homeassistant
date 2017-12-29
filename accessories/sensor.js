@@ -5,7 +5,7 @@ let Characteristic;
 let communicationError;
 
 class HomeAssistantSensor {
-  constructor(log, data, client, service, characteristic, transformData) {
+  constructor(log, data, client, service, characteristic, transformData, characteristic2, transformData2) {
     // device info
     this.data = data;
     this.entity_id = data.entity_id;
@@ -36,6 +36,12 @@ class HomeAssistantSensor {
     if (transformData) {
       this.transformData = transformData;
     }
+    if (characteristic2) {
+      this.characteristic2 = characteristic2;
+    }        
+    if (transformData2) {
+      this.transformData2 = transformData2;
+    }    
     this.client = client;
     this.log = log;
     this.batterySource = data.attributes.homebridge_battery_source;
@@ -177,20 +183,44 @@ function HomeAssistantSensorFactory(log, data, client) {
   } else if (typeof data.attributes.unit_of_measurement === 'string' && data.attributes.unit_of_measurement.toLowerCase() === 'ppm' && (data.entity_id.includes('co2') || data.attributes.homebridge_sensor_type === 'co2')) {
     service = Service.CarbonDioxideSensor;
     characteristic = Characteristic.CarbonDioxideLevel;
+    //AQI + PM2_5 추가
+  } else if ((typeof data.attributes.unit_of_measurement === 'string' && data.attributes.unit_of_measurement.toLowerCase() === '㎍/㎥') || data.attributes.homebridge_sensor_type === 'pm10density') {
+    service = Service.AirQualitySensor;
+    characteristic2 = Characteristic.PM2_5Density;
+    transformData2 = function transformData(dataToTransform) {
+      const value2 = parseFloat(dataToTransform.state);
+      return value2;
+    };    
+    characteristic = Characteristic.AirQuality;
+    transformData = function transformData(dataToTransform) { // eslint-disable-line no-shadow
+      const value = parseFloat(dataToTransform.state);
+      if (value <= 30) {
+        return 1;
+      } else if (value >= 31 && value <= 70) {
+        return 2;
+      } else if (value >= 71 && value <= 100) {
+        return 3;
+      } else if (value >= 101 && value <= 150) {
+        return 4;
+      } else if (value >= 151) {
+        return 5;
+      }
+      return 0;
+    };        
   } else if ((typeof data.attributes.unit_of_measurement === 'string' && data.attributes.unit_of_measurement.toLowerCase() === 'aqi') || data.attributes.homebridge_sensor_type === 'air_quality') {
     service = Service.AirQualitySensor;
     characteristic = Characteristic.AirQuality;
     transformData = function transformData(dataToTransform) { // eslint-disable-line no-shadow
       const value = parseFloat(dataToTransform.state);
-      if (value <= 75) {
+      if (value <= 30) {
         return 1;
-      } else if (value >= 76 && value <= 150) {
+      } else if (value >= 31 && value <= 70) {
         return 2;
-      } else if (value >= 151 && value <= 225) {
+      } else if (value >= 71 && value <= 100) {
         return 3;
-      } else if (value >= 226 && value <= 300) {
+      } else if (value >= 101 && value <= 150) {
         return 4;
-      } else if (value >= 301) {
+      } else if (value >= 151) {
         return 5;
       }
       return 0;
