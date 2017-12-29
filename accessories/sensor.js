@@ -36,9 +36,9 @@ class HomeAssistantSensor {
     if (transformData) {
       this.transformData = transformData;
     }
-//    if (characteristic2) {
+    if (characteristic2) {
       this.characteristic2 = characteristic2;
-//    }        
+    }        
     if (transformData2) {
       this.transformData2 = transformData2;
     }    
@@ -52,9 +52,6 @@ class HomeAssistantSensor {
     return parseFloat(data.state);
   }
 
-  transformData2(data) {
-    return parseFloat(data.state);
-  }  
   
   onEvent(oldState, newState) {
     if (this.service === Service.CarbonDioxideSensor) {
@@ -199,9 +196,6 @@ function HomeAssistantSensorFactory(log, data, client) {
     service = Service.AirQualitySensor;
     characteristic = Characteristic.AirQuality;
     characteristic2 = Characteristic.PM2_5Density;
-//    transformData2 = function transformData(dataToTransform) {
-//      return dataToTransform.state;
-//    };
     transformData = function transformData(dataToTransform) { // eslint-disable-line no-shadow
       const value = parseFloat(dataToTransform.state);
       transformData2 = value;
