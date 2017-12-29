@@ -199,10 +199,7 @@ function HomeAssistantSensorFactory(log, data, client) {
     service = Service.AirQualitySensor;
     characteristic = Characteristic.AirQuality;
     characteristic2 = Characteristic.PM2_5Density;
-    transformData2 = function transformData2(dataToTransform) {
-      const value = parseFloat(dataToTransform.state);
-      return value;
-    };        
+    transformData2 = dataToTransform.state;
     transformData = function transformData(dataToTransform) { // eslint-disable-line no-shadow
       const value = parseFloat(dataToTransform.state);
       if (value <= 30) {
