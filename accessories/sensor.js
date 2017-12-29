@@ -67,13 +67,14 @@ class HomeAssistantSensor {
       const detected = (transformed > 1000 ? abnormal : normal);
       this.sensorService.getCharacteristic(Characteristic.CarbonDioxideDetected)
         .setValue(detected, null, 'internal');
+    } else if (this.attributes.homebridge_sensor_type === 'PM2_5Density') {
+        this.sensorService.getCharacteristic(this.characteristic)
+          .setValue(this.transformData(newState), null, 'internal');
+        this.sensorService.getCharacteristic(this.characteristic2)
+          .setValue(this.transformData2(newState), null, 'internal');      
     } else {
-      this.sensorService.getCharacteristic(this.characteristic)
-        .setValue(this.transformData(newState), null, 'internal');
-      if (this.characteristic2) {
-      this.sensorService.getCharacteristic(this.characteristic2)
-        .setValue(this.transformData2(newState), null, 'internal');
-      }
+        this.sensorService.getCharacteristic(this.characteristic)
+          .setValue(this.transformData(newState), null, 'internal');
     }
   }
 
@@ -194,7 +195,7 @@ function HomeAssistantSensorFactory(log, data, client) {
     service = Service.CarbonDioxideSensor;
     characteristic = Characteristic.CarbonDioxideLevel;
     //AQI + PM2_5 추가
-  } else if ((typeof data.attributes.unit_of_measurement === 'string' && data.attributes.unit_of_measurement.toLowerCase() === '㎍/㎥') || data.attributes.homebridge_sensor_type === 'PM2_5Density') {
+  } else if (data.attributes.homebridge_sensor_type === 'PM2_5Density') {
     service = Service.AirQualitySensor;
     characteristic = Characteristic.AirQuality;
     characteristic2 = Characteristic.PM2_5Density;
