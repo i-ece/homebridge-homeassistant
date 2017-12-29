@@ -188,14 +188,12 @@ function HomeAssistantSensorFactory(log, data, client) {
     //AQI + PM2_5 추가
   } else if ((typeof data.attributes.unit_of_measurement === 'string' && data.attributes.unit_of_measurement.toLowerCase() === '㎍/㎥') || data.attributes.homebridge_sensor_type === 'PM2_5Density') {
     service = Service.AirQualitySensor;
-    characteristic2 = Characteristic.PM2_5Density;
-    transformData2 = function transformData(dataToTransform) {
-      const value2 = parseFloat(dataToTransform.state);
-      return value2;
-    };    
+
     characteristic = Characteristic.AirQuality;
+    characteristic2 = Characteristic.PM2_5Density;    
     transformData = function transformData(dataToTransform) { // eslint-disable-line no-shadow
       const value = parseFloat(dataToTransform.state);
+      transformData2 = value;
       if (value <= 30) {
         return 1;
       } else if (value >= 31 && value <= 70) {
